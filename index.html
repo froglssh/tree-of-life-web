@@ -1416,16 +1416,24 @@ function startPlay(){
   if(ST.done){ST={idx:0,tries:{},tags:{},passed:{},who:ST.who,t0:Date.now(),done:false}}
   show(ST.idx||0);
 }
+const LEARN_FOR_STAGE=[0, 1, 2, 3, 5, 6, 8, 9];
 el('go').onclick=()=>{grabWho();startPlay()};
 el('go-learn').onclick=()=>{grabWho();openLearn(0)};
-el('to-learn').onclick=()=>openLearn(0);
+el('to-learn').onclick=()=>openLearn(LEARN_FOR_STAGE[ST.idx]||0);
 el('l-prev').onclick=()=>LI>0&&showLearn(LI-1);
+if(el('l-resume'))el('l-resume').onclick=startPlay;
 el('l-next').onclick=()=>LI<LEARN.length-1?showLearn(LI+1):startPlay();
 el('check-btn').onclick=check;
+if(el('question-select'))el('question-select').onchange=e=>show(Number(e.target.value));
+if(el('prev-btn'))el('prev-btn').onclick=()=>show(ST.idx-1);
+if(el('skip-btn'))el('skip-btn').onclick=()=>ST.idx+1<STAGES.length?show(ST.idx+1):finish();
+if(el('finish-btn'))el('finish-btn').onclick=finish;
 el('reset-btn').onclick=()=>{if(answered||dragDone)return;const s=STAGES[ST.idx];
   if(s.kind==='build'){const st=s.steps[bStep];st.slots.forEach(x=>{if(!(st.pre&&st.pre[x.id]))delete place[x.id]});sel=null;syncBoard();el('q-fb').innerHTML='';return;}place={};sel=null;seqv=[];fillv={};fillOn=null;matchv={};gridv={};tfv={};mtxv={};quizv={};
   if(s.kind==='drag')syncBoard();else renderPanel(s);el('q-fb').innerHTML=s.preRefs?refHTML(s.preRefs):'';bindZoom(el('q-fb'));el('barmsg').textContent='';};
 el('next-btn').onclick=()=>ST.idx+1<STAGES.length?show(ST.idx+1):finish();
+window.addEventListener('beforeunload',saveDraft);
+window.addEventListener('pagehide',saveDraft);
 const B=el('board');
 B.addEventListener('pointerdown',onDown);B.addEventListener('pointermove',onMove);B.addEventListener('pointerup',onUp);B.addEventListener('pointercancel',onUp);
 B.addEventListener('click',hotClick);
