@@ -261,6 +261,10 @@ figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:
 .ltext ul{margin:0 0 12px;padding-left:1.2em} .ltext li{margin-bottom:6px}
 .ltext b.k1{color:var(--g1)} .ltext b.k2{color:var(--g2)} .ltext b.k3{color:var(--g3)} .ltext b.k4{color:var(--accent)}
 .lnav{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap}
+.lhome{position:sticky;top:0;z-index:25;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;margin-bottom:6px;background:var(--ground)}
+.lhome .homebtn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--accent);color:var(--accent);border-radius:999px;padding:6px 16px;font-size:14.5px;font-weight:600;cursor:pointer;box-shadow:var(--shadow);transition:background .15s,color .15s}
+.lhome .homebtn:hover{background:var(--accent);color:var(--accent-ink)}
+.lhome .lhtitle{font-family:var(--mono);font-size:13px;color:var(--ink-3);letter-spacing:.04em}
 .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .dots button{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--line);background:var(--surface);font-family:var(--mono);font-size:12px;cursor:pointer;color:var(--ink-3)}
 .dots button.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
@@ -541,7 +545,7 @@ table.sum2.arch td{padding:5px 6px}
   <div class="tprow">
     <span class="brand">生命樹探險隊 <span class="version">v3.0 課本整合版</span></span>
     <span class="crumb" id="crumb"></span>
-    <button class="linkbtn" id="to-learn">回圖解教學</button>
+    <button class="linkbtn" id="to-learn">回圖解教學</button><button class="linkbtn" type="button" data-gohome style="margin-left:14px" title="回到首頁">🏠 回首頁</button>
   </div>
   <div class="track" id="track"></div>
   <div class="legend">
@@ -582,6 +586,7 @@ table.sum2.arch td{padding:5px 6px}
   </section>
 
   <section id="learn" class="hidden"><div class="learn">
+    <div class="lhome"><button class="homebtn" type="button" data-gohome title="回到首頁">🏠 回首頁</button><span class="lhtitle">圖解教學</span></div>
     <div class="lcard" id="lcard"></div>
     <div class="lnav">
       <button class="btn ghost" id="l-prev">← 上一張</button>
@@ -1667,7 +1672,7 @@ function finish(){
     <div class="card" style="margin-top:16px"><h3 style="margin-bottom:10px">迷思概念診斷</h3><div class="tags">${miss}</div></div>
     <div style="text-align:center;margin:24px 0 60px">
       <button class="btn" onclick="startPlay()">重新完整挑戰</button>
-      <button class="btn ghost" onclick="openLearn(0)" style="margin-left:10px">複習重點圖解</button>
+      <button class="btn ghost" onclick="openLearn(0)" style="margin-left:10px">複習重點圖解</button><button class="btn ghost" type="button" data-gohome style="margin-left:10px">🏠 回首頁</button>
     </div>
   </div>`;
   el('done').classList.remove('hidden');
@@ -1677,6 +1682,16 @@ function finish(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function grabWho(){ST.who={n:el('f-name').value.trim(),c:el('f-cls').value.trim(),s:el('f-no').value.trim()};save();}
+/* ── 回首頁 ── */
+function goHome(){
+  try{if(!el('play').classList.contains('hidden')&&typeof saveDraft==='function')saveDraft();}catch(e){}
+  try{if(typeof flipStop==='function')flipStop();}catch(e){}
+  clearInterval(FT);FT=null;
+  ['learn','play','bar','done','topbar'].forEach(x=>{const n=el(x);if(n)n.classList.add('hidden')});
+  el('intro').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-gohome]'))goHome();});
 function openLearn(i){saveDraft();if(el('l-resume'))el('l-resume').style.display=activeStage?'inline-flex':'none';['intro','play','bar','done'].forEach(x=>el(x).classList.add('hidden'));el('topbar').classList.add('hidden');el('learn').classList.remove('hidden');showLearn(i||0);}
 function startPlay(){
   clearInterval(FT);FT=null;
